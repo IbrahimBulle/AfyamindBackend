@@ -57,4 +57,10 @@ func main() {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("serve: %v", err)
 	}
+	go func(){
+		for{
+			http.Get("https://afyamindbackend.onrender.com")
+			time.Sleep(5 * time.Minute)
+		}
+	}()
 }
