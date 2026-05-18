@@ -26,9 +26,9 @@ func main() {
 
 	router := httpapi.NewRouter(cfg, application.Store, application.AI)
 
-	corsHandler := cors.New(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins: []string{
-			"*",
+			"https://afyamindfrontendnew.netlify.app",
 		},
 		AllowedMethods: []string{
 			"GET",
@@ -39,28 +39,36 @@ func main() {
 			"OPTIONS",
 		},
 		AllowedHeaders: []string{
-			"*",
+			"Accept",
+			"Authorization",
+			"Content-Type",
 		},
-		AllowCredentials: false,
-	}).Handler(router)
+		AllowCredentials: true,
+		Debug: true,
+	})
 
 	server := &http.Server{
 		Addr:         cfg.ListenAddr(),
-		Handler:      corsHandler,
+		Handler:      c.Handler(router),
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 90 * time.Second,
 		IdleTimeout:  90 * time.Second,
 	}
+
+	go func() {
+		for {
+			_, err := http.Get("https://afyamindbackend.onrender.com")
+			if err != nil {
+				log.Println("ping error:", err)
+			}
+
+			time.Sleep(5 * time.Minute)
+		}
+	}()
 
 	log.Printf("AfyaMind backend listening on %s", server.Addr)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("serve: %v", err)
 	}
-	go func(){
-		for{
-			http.Get("https://afyamindbackend.onrender.com")
-			time.Sleep(5 * time.Minute)
-		}
-	}()
 }
