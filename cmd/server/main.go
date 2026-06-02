@@ -55,16 +55,6 @@ func main() {
 		IdleTimeout:  90 * time.Second,
 	}
 
-	go func() {
-		for {
-			_, err := http.Get("https://afyamindbackend.onrender.com")
-			if err != nil {
-				log.Println("ping error:", err)
-			}
-
-			time.Sleep(5 * time.Minute)
-		}
-	}()
 
 	log.Printf("AfyaMind backend listening on %s", server.Addr)
 
